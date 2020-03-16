@@ -168,30 +168,21 @@ list<pair<int, int>> astar(const vector<vector<int>>& matrix, pair<int, int> sta
     
     Heap<Node> heapOfNodes;
     vector<Node> closedList;
-    
+    vector<pair<int, int>> neighbours {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
     heapOfNodes.addToHeap(startNode, Node::nodeComparer);
     while(1) {
         auto&& evicted = heapOfNodes.top();
         closedList.push_back(evicted);
 
-        bool ret = false;
-        ret = process(evicted, Node( evicted.xPos + 1, evicted.yPos, evicted.gValue + 1, dist(end.first, end.second, evicted.xPos + 1, evicted.yPos)), 
-                matrix, heapOfNodes, closedList, end);
-
-        if (!ret) 
-            ret = process(evicted, Node( evicted.xPos - 1, evicted.yPos, evicted.gValue + 1, dist(end.first, end.second, evicted.xPos - 1, evicted.yPos)), 
-                matrix, heapOfNodes,  closedList, end);
-        else break ;
-
-        if (!ret) 
-            ret = process(evicted, Node( evicted.xPos, evicted.yPos + 1, evicted.gValue + 1, dist(end.first, end.second, evicted.xPos, evicted.yPos + 1)), 
-                matrix, heapOfNodes, closedList, end);
-        else break;
-
-        if (!ret) 
-            ret = process(evicted, Node( evicted.xPos, evicted.yPos - 1, evicted.gValue + 1, dist(end.first, end.second, evicted.xPos, evicted.yPos - 1)), 
-                matrix, heapOfNodes, closedList, end);
-        else break;
+        auto ret = false;
+        for (auto coods : neighbours) {
+            ret = process(evicted, Node( evicted.xPos + coods.first, evicted.yPos + coods.second, 
+                                         evicted.gValue + 1, dist(end.first, end.second, evicted.xPos + coods.first, evicted.yPos + coods.second)), 
+                                         matrix, heapOfNodes, closedList, end);
+            if (ret)
+                break;
+        }
 
         if (heapOfNodes.isEmpty() || ret)
             break;
